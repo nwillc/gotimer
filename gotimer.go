@@ -2,10 +2,13 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/gdamore/tcell/v2"
+	"github.com/nwillc/gotimer/gen/version"
 	"github.com/nwillc/gotimer/setup"
 	"github.com/nwillc/gotimer/typeface"
 	"github.com/nwillc/gotimer/utils"
+	"os"
 	"time"
 )
 
@@ -17,6 +20,11 @@ type area struct {
 func main() {
 	flag.Parse()
 
+	if *setup.Flags.Version {
+		fmt.Println("Version:", version.Version)
+		os.Exit(0)
+	}
+	
 	duration, err := time.ParseDuration(*setup.Flags.Time)
 	if err != nil {
 		panic(err)
