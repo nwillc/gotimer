@@ -1,5 +1,6 @@
 package typeface
 
+// Medium sized Font, 4x6 dots or less per FontRune.
 var Medium = make(Font)
 
 func init() {

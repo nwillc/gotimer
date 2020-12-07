@@ -24,7 +24,7 @@ func main() {
 		fmt.Println("Version:", version.Version)
 		os.Exit(0)
 	}
-	
+
 	duration, err := time.ParseDuration(*setup.Flags.Time)
 	if err != nil {
 		panic(err)

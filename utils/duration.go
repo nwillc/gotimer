@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Format a time.Duration into a string for the format `HH:MM.SS`.
 func Format(d time.Duration) (string, error) {
 	var sb strings.Builder
 

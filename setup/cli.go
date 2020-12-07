@@ -2,7 +2,8 @@ package setup
 
 import "flag"
 
-var Flags struct {
+// Flags for the command line interface.
+var Flags  struct {
 	Version *bool
 	Time    *string
 }

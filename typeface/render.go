@@ -13,6 +13,7 @@ var filled = tcell.StyleDefault.
 	Foreground(tcell.ColorOrangeRed).
 	Background(tcell.ColorBlack)
 
+// RenderRune renders the FontRune for a specified rune in a Font at a given location.
 func RenderRune(s tcell.Screen, r rune, font Font, x int, y int) (int, error) {
 	fontRune, ok := font[r]
 	if !ok {
