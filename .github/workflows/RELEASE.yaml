@@ -25,14 +25,14 @@ jobs:
 
     - name: Create Artifact
       run: |
-        GOOS=${{ matrix.target.os }} GOARCH=${{ matrix.target.arch }} go build -o snipgo
-        zip -j -r snipgo_${{ matrix.target.os }}_${{ matrix.target.arch }}.zip snipgo
+        GOOS=${{ matrix.target.os }} GOARCH=${{ matrix.target.arch }} go build -o gotimer
+        zip -j -r gotimer_${{ matrix.target.os }}_${{ matrix.target.arch }}.zip gotimer
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: snipgo_${{ matrix.target.os }}_${{ matrix.target.arch }}
-        path: snipgo_${{ matrix.target.os }}_${{ matrix.target.arch }}.zip
+        name: gotimer_${{ matrix.target.os }}_${{ matrix.target.arch }}
+        path: gotimer_${{ matrix.target.os }}_${{ matrix.target.arch }}.zip
   # Create the release for the tag
   release:
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
     - name: Download Artifact
       uses: actions/download-artifact@v2
       with:
-        name: snipgo_${{ matrix.target.os }}_${{ matrix.target.arch }}
+        name: gotimer_${{ matrix.target.os }}_${{ matrix.target.arch }}
 
     - name: Upload Artifact to Release
       uses: actions/upload-release-asset@v1
@@ -75,7 +75,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
       with:
         upload_url: ${{ needs.release.outputs.upload_url }}
-        asset_path: ./snipgo_${{ matrix.target.os }}_${{ matrix.target.arch }}.zip
-        asset_name: snipgo_${{ matrix.target.os }}_${{ matrix.target.arch }}.zip
+        asset_path: ./gotimer_${{ matrix.target.os }}_${{ matrix.target.arch }}.zip
+        asset_name: gotimer_${{ matrix.target.os }}_${{ matrix.target.arch }}.zip
         asset_content_type: application/zip
 
