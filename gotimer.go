@@ -2,10 +2,17 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"github.com/gdamore/tcell/v2"
 	"github.com/nwillc/gotimer/setup"
+	"github.com/nwillc/gotimer/typeface"
+	"github.com/nwillc/gotimer/utils"
 	"time"
 )
+
+type area struct {
+	width  int
+	height int
+}
 
 func main() {
 	flag.Parse()
@@ -14,17 +21,39 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Duration:", duration)
-	finished := make(chan bool)
-	completed := time.Now().Add(duration)
-	go func(finished chan bool) {
-		for {
-			time.Sleep(time.Second)
-			fmt.Println("-")
-			if time.Now().After(completed) {
-				finished <- true
-			}
+
+	var screen tcell.Screen
+	if screen, err = tcell.NewScreen(); err != nil {
+		panic(err)
+	}
+
+	if err := screen.Init(); err != nil {
+		panic(err)
+	}
+
+	for {
+		time.Sleep(time.Second)
+		display(duration, screen)
+		duration = duration - time.Second
+		if duration <= 0 {
+			break
 		}
-	}(finished)
-	<- finished
+	}
+
+	time.Sleep(5 * time.Second)
+	screen.Fini()
+}
+
+func display(duration time.Duration, screen tcell.Screen) {
+	screen.Clear()
+	str, _ := utils.Format(duration)
+	y := 1
+	for _, c := range str {
+		w, err := typeface.RenderRune(screen, c, typeface.Medium, 0, y)
+		if err != nil {
+			panic(err)
+		}
+		y += w + 2
+	}
+	screen.Show()
 }
