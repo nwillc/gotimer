@@ -12,14 +12,11 @@ import (
 	"time"
 )
 
-type area struct {
-	width  int
-	height int
-}
+// paused indicates timer is paused
+var paused = false
 
 func main() {
 	flag.Parse()
-
 	if *setup.Flags.Version {
 		fmt.Println("Version:", version.Version)
 		os.Exit(0)
@@ -29,39 +26,56 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	var screen tcell.Screen
-	if screen, err = tcell.NewScreen(); err != nil {
+	var s tcell.Screen
+	if s, err = tcell.NewScreen(); err != nil {
 		panic(err)
 	}
 
-	if err := screen.Init(); err != nil {
+	if err := s.Init(); err != nil {
 		panic(err)
 	}
+
+	go func() {
+		for {
+			time.Sleep(time.Second)
+			if paused {
+				continue
+			}
+			display(duration, s)
+			duration = duration - time.Second
+			if duration < 0 {
+				break
+			}
+		}
+	}()
 
 	for {
-		time.Sleep(time.Second)
-		display(duration, screen)
-		duration = duration - time.Second
-		if duration <= 0 {
-			break
+		ev := s.PollEvent()
+		switch ev := ev.(type) {
+		case *tcell.EventKey:
+			if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC {
+				s.Fini()
+				os.Exit(0)
+			} else if ev.Rune() == ' ' {
+				paused = !paused
+			}
 		}
 	}
-
-	time.Sleep(5 * time.Second)
-	screen.Fini()
 }
 
-func display(duration time.Duration, screen tcell.Screen) {
-	screen.Clear()
-	str, _ := utils.Format(duration)
-	y := 1
+func display(duration time.Duration, s tcell.Screen) {
+	s.Clear()
+	str, err := utils.Format(duration)
+	if err != nil {
+		panic(err)
+	}
+	x := 1
 	for _, c := range str {
-		w, err := typeface.RenderRune(screen, c, typeface.Medium, 0, y)
+		width, err := typeface.RenderRune(s, c, typeface.Medium, x, 1)
 		if err != nil {
 			panic(err)
 		}
-		y += w + 2
+		x += width + 1
 	}
-	screen.Show()
+	s.Show()
 }

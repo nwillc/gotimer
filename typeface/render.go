@@ -20,14 +20,14 @@ func RenderRune(s tcell.Screen, r rune, font Font, x int, y int) (int, error) {
 		return 0, fmt.Errorf("no font char for rune %c", r)
 	}
 
-	for xx, line := range fontRune {
-		for yy, point := range line {
+	for yy, line := range fontRune {
+		for xx, point := range line {
 			style := blank
 			if point {
 				style = filled
 			}
-			s.SetCell(y+yy, x+xx, style, 0x2588)
+			s.SetCell(x+xx, y+yy, style, 0x2588)
 		}
 	}
-	return len(fontRune[0]), nil
+	return len(fontRune), nil
 }

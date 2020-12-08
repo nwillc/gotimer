@@ -28,6 +28,24 @@ func TestFormat(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:    "OneMinute",
+			args:    args{duration: 1 * time.Minute},
+			want:    "01.00",
+			wantErr: false,
+		},
+		{
+			name:    "OneHour",
+			args:    args{duration: 1 * time.Hour},
+			want:    "01:00.00",
+			wantErr: false,
+		},
+		{
+			name:    "FiftyNineSeconds",
+			args:    args{duration: 59 * time.Second},
+			want:    "59",
+			wantErr: false,
+		},
+		{
 			name:    "ElevenMinutesFiveSeconds",
 			args:    args{duration: 11*time.Minute + 5*time.Second},
 			want:    "11.05",
