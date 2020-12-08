@@ -16,4 +16,6 @@ Usage of ./gotimer:
     	The time for the timer (default "5s")
 ```
 
-The time duration is given in hours, minutes and seconds: `#h#m#s` 
+ - The time duration is given in hours, minutes and seconds: `#h#m#s`. 
+ - Exit with Ctrl-C or ESC
+ - Pause with SPACE
