@@ -26,6 +26,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	color, ok := tcell.ColorNames[*setup.Flags.Color]
+	if !ok {
+		panic(fmt.Errorf("color %s not known", *setup.Flags.Color))
+	}
 	var s tcell.Screen
 	if s, err = tcell.NewScreen(); err != nil {
 		panic(err)
@@ -41,7 +46,7 @@ func main() {
 			if paused {
 				continue
 			}
-			display(duration, s)
+			display(duration, s, color)
 			duration = duration - time.Second
 			if duration < 0 {
 				break
@@ -63,7 +68,7 @@ func main() {
 	}
 }
 
-func display(duration time.Duration, s tcell.Screen) {
+func display(duration time.Duration, s tcell.Screen, color tcell.Color) {
 	s.Clear()
 	str, err := utils.Format(duration)
 	if err != nil {
@@ -71,7 +76,7 @@ func display(duration time.Duration, s tcell.Screen) {
 	}
 	x := 1
 	for _, c := range str {
-		width, err := typeface.RenderRune(s, c, typeface.Medium, x, 1)
+		width, err := typeface.RenderRune(s, c, typeface.Medium, color, x, 1)
 		if err != nil {
 			panic(err)
 		}
