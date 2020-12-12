@@ -49,6 +49,7 @@ func main() {
 			display(duration, s, color)
 			duration = duration - time.Second
 			if duration < 0 {
+				s.Beep()
 				break
 			}
 		}
