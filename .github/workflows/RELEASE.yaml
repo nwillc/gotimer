@@ -2,7 +2,6 @@ name: Create Release With Assets
 
 on:
   push:
-    branches: [ main ]
     tags:
       - 'v*'
 
@@ -33,16 +32,18 @@ jobs:
       with:
         name: gotimer_${{ matrix.target.os }}_${{ matrix.target.arch }}
         path: gotimer_${{ matrix.target.os }}_${{ matrix.target.arch }}.zip
+
   # Create the release for the tag
   release:
+    name: Create Release
     runs-on: ubuntu-latest
     needs: artifacts
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
 
     steps:
-    - uses: actions/checkout@v2
-
+    - name: Checkout code
+      uses: actions/checkout@v2
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -53,6 +54,7 @@ jobs:
         release_name: Release ${{ github.ref }}
         draft: false
         prerelease: false
+
   # Add all the builds as assets to the release
   add:
     runs-on: ubuntu-latest
