@@ -7,10 +7,12 @@ import (
 	"strings"
 )
 
-const PIXEL = 35
+const blackPixel = 35
 
 //go:embed bitmaps/medium/*.txt
 var bitmaps embed.FS
+
+// Medium sized font
 var Medium Font
 
 func init() {
@@ -54,7 +56,7 @@ func toFontRune(fs embed.FS, name string) (FontRune, error) {
 		}
 		var l []bool
 		for _, c := range line {
-			l = append(l, c == PIXEL)
+			l = append(l, c == blackPixel)
 		}
 		fr = append(fr, l)
 	}
