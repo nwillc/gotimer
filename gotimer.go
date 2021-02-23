@@ -27,6 +27,11 @@ func main() {
 		panic(err)
 	}
 
+	_, ok := typeface.AvailableFonts[*setup.Flags.FontName]
+	if !ok {
+		panic("Unknown font " + *setup.Flags.FontName)
+	}
+
 	color, ok := tcell.ColorNames[*setup.Flags.Color]
 	if !ok {
 		panic(fmt.Errorf("color %s not known", *setup.Flags.Color))
@@ -46,7 +51,7 @@ func main() {
 			if paused {
 				continue
 			}
-			display(duration, s, color)
+			display(duration, s, color, *setup.Flags.FontName)
 			duration = duration - time.Second
 			if duration < 0 {
 				s.Beep()
@@ -69,7 +74,11 @@ func main() {
 	}
 }
 
-func display(duration time.Duration, s tcell.Screen, color tcell.Color) {
+func display(duration time.Duration, s tcell.Screen, color tcell.Color, fontName string) {
+	font, ok := typeface.AvailableFonts[fontName]
+	if !ok {
+		panic("font not available")
+	}
 	s.Clear()
 	str, err := utils.Format(duration)
 	if err != nil {
@@ -77,7 +86,7 @@ func display(duration time.Duration, s tcell.Screen, color tcell.Color) {
 	}
 	x := 1
 	for _, c := range str {
-		width, err := typeface.RenderRune(s, c, typeface.Medium, color, x, 1)
+		width, err := typeface.RenderRune(s, c, font, color, x, 1)
 		if err != nil {
 			panic(err)
 		}

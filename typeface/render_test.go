@@ -7,6 +7,8 @@ import (
 )
 
 func TestRenderRuneBadRune(t *testing.T) {
-	_, err := RenderRune(nil, 'P', Medium, tcell.ColorYellow, 0, 0)
+	font, ok := AvailableFonts["medium"]
+	assert.True(t, ok)
+	_, err := RenderRune(nil, 'P', font, tcell.ColorYellow, 0, 0)
 	assert.Error(t, err)
 }
