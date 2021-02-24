@@ -11,22 +11,20 @@ import (
 	"time"
 )
 
-// paused indicates timer is paused
-var paused = false
-
 func main() {
-	setup.Flags.ParseOsArgs()
-	if *setup.Flags.Values.Version {
+	flags := &setup.Values{}
+	setup.NewFlagSetWithValues(os.Args[0], flags).ParseOsArgs()
+	if *flags.Version {
 		fmt.Println("Version:", version.Version)
 		os.Exit(0)
 	}
 
-	duration, err := time.ParseDuration(*setup.Flags.Values.Time)
+	duration, err := time.ParseDuration(*flags.Time)
 	if err != nil {
 		panic(err)
 	}
 
-	color := tcell.ColorNames[*setup.Flags.Values.ColorName]
+	color := tcell.ColorNames[*flags.ColorName]
 	var s tcell.Screen
 	if s, err = tcell.NewScreen(); err != nil {
 		panic(err)
@@ -36,16 +34,18 @@ func main() {
 		panic(err)
 	}
 
+	// paused indicates timer is paused
+	var paused = false
 	go func() {
 		for {
 			time.Sleep(time.Second)
 			if paused {
 				continue
 			}
-			display(duration, s, color, *setup.Flags.Values.FontName)
+			display(duration, s, color, *flags.FontName)
 			duration = duration - time.Second
 			if duration < 0 {
-				s.Beep()
+				_ = s.Beep()
 				break
 			}
 		}

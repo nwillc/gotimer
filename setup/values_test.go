@@ -57,13 +57,14 @@ func TestCommandLines(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			cli := newFlagSetWithValues(test.name)
+			values := &Values{}
+			cli := NewFlagSetWithValues(test.name, values)
 			err := cli.Parse(test.args)
 			assert.Equal(t, test.parseError, err != nil)
 			if !test.parseError {
-				assert.Equal(t, test.version, *cli.Values.Version)
-				assert.Equal(t, test.font, *cli.Values.FontName)
-				assert.Equal(t, test.colorName, *cli.Values.ColorName)
+				assert.Equal(t, test.version, *values.Version)
+				assert.Equal(t, test.font, *values.FontName)
+				assert.Equal(t, test.colorName, *values.ColorName)
 			}
 		})
 	}

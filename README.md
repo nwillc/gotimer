@@ -13,8 +13,10 @@ A simple terminal based digital timer written in Go to use as a Pomodoro time.
 ```bash
 $ ./gotimer -h
 Usage of ./gotimer:
-  -color string
-    	The display color (default "orangered")
+  -color value
+    	set color (default "orangered")
+  -font value
+    	set font (default "7")
   -time string
     	The time for the timer (default "25m")
   -version
