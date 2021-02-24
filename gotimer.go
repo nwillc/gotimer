@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/nwillc/gotimer/gen/version"
@@ -16,26 +15,18 @@ import (
 var paused = false
 
 func main() {
-	flag.Parse()
-	if *setup.Flags.Version {
+	setup.Flags.ParseOsArgs()
+	if *setup.Flags.Values.Version {
 		fmt.Println("Version:", version.Version)
 		os.Exit(0)
 	}
 
-	duration, err := time.ParseDuration(*setup.Flags.Time)
+	duration, err := time.ParseDuration(*setup.Flags.Values.Time)
 	if err != nil {
 		panic(err)
 	}
 
-	_, ok := typeface.AvailableFonts[*setup.Flags.FontName]
-	if !ok {
-		panic("Unknown font " + *setup.Flags.FontName)
-	}
-
-	color, ok := tcell.ColorNames[*setup.Flags.Color]
-	if !ok {
-		panic(fmt.Errorf("color %s not known", *setup.Flags.Color))
-	}
+	color := tcell.ColorNames[*setup.Flags.Values.ColorName]
 	var s tcell.Screen
 	if s, err = tcell.NewScreen(); err != nil {
 		panic(err)
@@ -51,7 +42,7 @@ func main() {
 			if paused {
 				continue
 			}
-			display(duration, s, color, *setup.Flags.FontName)
+			display(duration, s, color, *setup.Flags.Values.FontName)
 			duration = duration - time.Second
 			if duration < 0 {
 				s.Beep()
