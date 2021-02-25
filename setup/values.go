@@ -2,6 +2,7 @@ package setup
 
 import (
 	"github.com/gdamore/tcell/v2"
+	"github.com/nwillc/gotimer/eflag"
 	"github.com/nwillc/gotimer/typeface"
 )
 
@@ -15,15 +16,18 @@ type Values struct {
 var defaultFont = "7"
 var defaultColor = "orangered"
 
-func NewFlagSetWithValues(name string, values *Values) *CliFlagSet {
-	fs := NewCliFlagSet(name)
-	values.Version = fs.Bool("version", false, "Display version.")
-	values.Time = fs.String("time", "25m", "The time for the timer")
-	values.ColorName = fs.MemberString("color", &defaultColor, "set color",
-		func(s string) bool { _, ok := tcell.ColorNames[s]; return ok },
+// NewEFlagSet sets up a EFlagSet for the Values provided.
+func NewEFlagSet(name string, values *Values) *eflag.EFlagSet {
+	efs := eflag.NewEFlagSet(name)
+	values.Version = efs.Bool("version", false, "Display version.")
+	values.Time = efs.String("time", "25m", "The time for the timer")
+	var colors []string
+	for k, _ := range tcell.ColorNames {
+		colors = append(colors, k)
+	}
+	values.ColorName = efs.MemberString("color", &defaultColor, "set color", colors,
 		func(s string) { values.ColorName = &s })
-	values.FontName = fs.MemberString("font", &defaultFont, "set font",
-		func(s string) bool { _, ok := typeface.AvailableFonts[s]; return ok },
-		func(s string) { values.FontName = &s})
-	return fs
+	values.FontName = efs.MemberString("font", &defaultFont, "set font", typeface.FontNames,
+		func(s string) { values.FontName = &s })
+	return efs
 }

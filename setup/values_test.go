@@ -58,7 +58,7 @@ func TestCommandLines(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			values := &Values{}
-			cli := NewFlagSetWithValues(test.name, values)
+			cli := NewEFlagSet(test.name, values)
 			err := cli.Parse(test.args)
 			assert.Equal(t, test.parseError, err != nil)
 			if !test.parseError {

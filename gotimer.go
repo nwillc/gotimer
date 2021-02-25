@@ -13,7 +13,7 @@ import (
 
 func main() {
 	flags := &setup.Values{}
-	setup.NewFlagSetWithValues(os.Args[0], flags).ParseOsArgs()
+	setup.NewEFlagSet(os.Args[0], flags).ParseOsArgs()
 	if *flags.Version {
 		fmt.Println("Version:", version.Version)
 		os.Exit(0)
