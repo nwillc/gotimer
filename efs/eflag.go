@@ -1,4 +1,4 @@
-package eflag
+package efs
 
 import (
 	"flag"
@@ -6,15 +6,15 @@ import (
 	"os"
 )
 
-// EFSet is an extended flag.FlagSet.
-type EFSet struct {
+// EFlagSet is an extended flag.FlagSet.
+type EFlagSet struct {
 	*flag.FlagSet
 	memberSets map[string][]string
 }
 
 // NewEFlagSet instantiate an EFlagSet with flag.ContinueOnError and default usage that enumerates MemberString choices.
-func NewEFlagSet(name string) *EFSet {
-	efs := EFSet{
+func NewEFlagSet(name string) *EFlagSet {
+	efs := EFlagSet{
 		FlagSet:    flag.NewFlagSet(name, flag.ContinueOnError),
 		memberSets: map[string][]string{},
 	}
@@ -23,7 +23,7 @@ func NewEFlagSet(name string) *EFSet {
 }
 
 // ParseOsArgs runs Parse(string) on the targeted EFlagSet against the program arguments.
-func (efs *EFSet) ParseOsArgs() {
+func (efs *EFlagSet) ParseOsArgs() {
 	err := efs.Parse(os.Args[1:])
 	if err != nil {
 		if err == flag.ErrHelp {
@@ -35,7 +35,7 @@ func (efs *EFSet) ParseOsArgs() {
 
 // MemberString defines a string flag with specified name, default value, and usage string.
 // It additionally provides a set of allowable values for that string to be a member of.
-func (efs *EFSet) MemberString(name string, value *string, usage string, values []string, setterFn func(string)) *string {
+func (efs *EFlagSet) MemberString(name string, value *string, usage string, values []string, setterFn func(string)) *string {
 	if !contains(values, *value) {
 		panic(fmt.Sprintf("illegal default %s for %s", *value, name))
 	}
@@ -50,7 +50,7 @@ func (efs *EFSet) MemberString(name string, value *string, usage string, values 
 	return value
 }
 
-func (efs *EFSet) defaultUsage() {
+func (efs *EFlagSet) defaultUsage() {
 	if efs.Name() == "" {
 		_, _ = fmt.Fprintf(efs.Output(), "Usage:\n")
 	} else {
