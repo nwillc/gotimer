@@ -15,11 +15,11 @@ func Format(d time.Duration) (string, error) {
 	}
 
 	if d >= time.Minute {
-		d = d % time.Hour
+		d %= time.Hour
 		sb.WriteString(fmt.Sprintf("%02d.", int(d.Minutes())))
 	}
 
-	d = d % time.Minute
+	d %= time.Minute
 	sb.WriteString(fmt.Sprintf("%02d", int(d.Seconds())))
 	return sb.String(), nil
 }

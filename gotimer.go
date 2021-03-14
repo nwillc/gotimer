@@ -43,7 +43,7 @@ func main() {
 				continue
 			}
 			display(duration, s, color, *flags.FontName)
-			duration = duration - time.Second
+			duration -= time.Second
 			if duration < 0 {
 				_ = s.Beep()
 				break
@@ -53,12 +53,12 @@ func main() {
 
 	for {
 		ev := s.PollEvent()
-		switch ev := ev.(type) {
+		switch et := ev.(type) {
 		case *tcell.EventKey:
-			if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC {
+			if et.Key() == tcell.KeyEscape || et.Key() == tcell.KeyCtrlC {
 				s.Fini()
 				os.Exit(0)
-			} else if ev.Rune() == ' ' {
+			} else if et.Rune() == ' ' {
 				paused = !paused
 			}
 		}
