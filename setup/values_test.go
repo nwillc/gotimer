@@ -34,8 +34,8 @@ func TestCommandLines(t *testing.T) {
 		},
 		{
 			name:      "MediumFont",
-			args:      []string{"-font", "medium"},
-			font:      "medium",
+			args:      []string{"-font", "6"},
+			font:      "6",
 			colorName: defaultColor,
 		},
 		{
