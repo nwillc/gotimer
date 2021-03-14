@@ -17,7 +17,7 @@ func TestBitmaps(t *testing.T) {
 		name string
 		args args
 	}{
-		{"Medium", args{"medium", 6}},
+		{"Six", args{"6", 6}},
 		{"Seven", args{"7", 7}},
 	}
 	for _, tt := range tests {
