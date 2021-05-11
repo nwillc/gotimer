@@ -24,8 +24,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	durationRest, err := time.ParseDuration(*flags.TimeRest)
+	if err != nil {
+		panic(err)
+	}
 
 	color := tcell.ColorNames[*flags.ColorName]
+	colorRest := tcell.ColorNames[*flags.ColorNameRest]
 	var s tcell.Screen
 	if s, err = tcell.NewScreen(); err != nil {
 		panic(err)
@@ -43,7 +48,7 @@ func main() {
 			if paused {
 				continue
 			}
-			display(duration, s, color, *flags.FontName)
+			display(duration, durationRest, s, color, colorRest, *flags.FontName)
 			duration -= time.Second
 			if duration < 0 {
 				_ = s.Beep()
@@ -66,19 +71,28 @@ func main() {
 	}
 }
 
-func display(duration time.Duration, s tcell.Screen, color tcell.Color, fontName string) {
+func display(duration time.Duration, durationRest time.Duration, s tcell.Screen, color tcell.Color, colorRest tcell.Color, fontName string) {
+	var width int
 	font, ok := typeface.AvailableFonts[fontName]
 	if !ok {
 		panic("font not available")
 	}
 	s.Clear()
-	str, err := utils.Format(duration, duration, true)
+	str, err := utils.Format(duration, durationRest, true)
 	if err != nil {
 		panic(err)
 	}
 	x := 1
+	state := "work"
 	for _, c := range str {
-		width, err := typeface.RenderRune(s, c, font, color, x, 1)
+		if c == ' ' {
+			state = "rest"
+		}
+		if state == "work" {
+			width, err = typeface.RenderRune(s, c, font, color, x, 1)
+		} else {
+			width, err = typeface.RenderRune(s, c, font, colorRest, x, 1)
+		}
 		if err != nil {
 			panic(err)
 		}

@@ -14,6 +14,7 @@ func Format(work time.Duration, rest time.Duration, enableRest bool) (string, er
 
 	// Rest time
 	if enableRest {
+		sb.WriteString(" ")
 		sb.WriteString(buildTime(rest))
 	}
 	return sb.String(), nil
