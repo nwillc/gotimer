@@ -7,7 +7,19 @@ import (
 )
 
 // Format a time.Duration into a string for the format `HH:MM.SS`.
-func Format(d time.Duration) (string, error) {
+func Format(work time.Duration, rest time.Duration, enableRest bool) (string, error) {
+	var sb strings.Builder
+
+	sb.WriteString(buildTime(work))
+
+	// Rest time
+	if enableRest {
+		sb.WriteString(buildTime(rest))
+	}
+	return sb.String(), nil
+}
+
+func buildTime(d time.Duration) string {
 	var sb strings.Builder
 
 	if d >= time.Hour {
@@ -21,5 +33,6 @@ func Format(d time.Duration) (string, error) {
 
 	d %= time.Minute
 	sb.WriteString(fmt.Sprintf("%02d", int(d.Seconds())))
-	return sb.String(), nil
+
+	return sb.String()
 }

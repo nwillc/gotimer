@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/nwillc/gotimer/gen/version"
 	"github.com/nwillc/gotimer/setup"
 	"github.com/nwillc/gotimer/typeface"
 	"github.com/nwillc/gotimer/utils"
-	"os"
-	"time"
 )
 
 func main() {
@@ -71,7 +72,7 @@ func display(duration time.Duration, s tcell.Screen, color tcell.Color, fontName
 		panic("font not available")
 	}
 	s.Clear()
-	str, err := utils.Format(duration)
+	str, err := utils.Format(duration, duration, true)
 	if err != nil {
 		panic(err)
 	}
