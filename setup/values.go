@@ -25,7 +25,7 @@ func NewEFlagSet(name string, values *Values) *efs.EFlagSet {
 	fs := efs.NewEFlagSet(name)
 	values.Version = fs.Bool("version", false, "Display version.")
 	values.Time = fs.String("time", "25m", "The time for the timer")
-	values.TimeRest = fs.String("timeRest", "5m", "The time for the rest timer")
+	values.TimeRest = fs.String("timeRest", "0s", "The time for the rest timer")
 	var colors []string
 	for k := range tcell.ColorNames {
 		colors = append(colors, k)

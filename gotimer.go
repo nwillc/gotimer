@@ -28,6 +28,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	restEnabled := *flags.TimeRest != "0s"
 
 	color := tcell.ColorNames[*flags.ColorName]
 	colorRest := tcell.ColorNames[*flags.ColorNameRest]
@@ -48,7 +49,7 @@ func main() {
 			if paused {
 				continue
 			}
-			display(duration, durationRest, s, color, colorRest, *flags.FontName)
+			display(duration, durationRest, s, color, colorRest, *flags.FontName, restEnabled)
 			if duration >= time.Second {
 				duration -= time.Second
 			}
@@ -79,14 +80,14 @@ func main() {
 	}
 }
 
-func display(duration time.Duration, durationRest time.Duration, s tcell.Screen, color tcell.Color, colorRest tcell.Color, fontName string) {
+func display(duration time.Duration, durationRest time.Duration, s tcell.Screen, color tcell.Color, colorRest tcell.Color, fontName string, restEnabled bool) {
 	var width int
 	font, ok := typeface.AvailableFonts[fontName]
 	if !ok {
 		panic("font not available")
 	}
 	s.Clear()
-	str, err := utils.Format(duration, durationRest, true)
+	str, err := utils.Format(duration, durationRest, restEnabled)
 	if err != nil {
 		panic(err)
 	}
