@@ -49,10 +49,18 @@ func main() {
 				continue
 			}
 			display(duration, durationRest, s, color, colorRest, *flags.FontName)
-			duration -= time.Second
-			if duration < 0 {
-				_ = s.Beep()
-				break
+			if duration >= time.Second {
+				duration -= time.Second
+			}
+			if duration <= 0 {
+				if durationRest >= time.Second {
+					durationRest -= time.Second
+					if durationRest < 0 {
+						break
+					}
+				}
+				//_ = s.Beep()
+				//break
 			}
 		}
 	}()
