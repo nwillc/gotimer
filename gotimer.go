@@ -57,11 +57,10 @@ func main() {
 				if durationRest >= time.Second {
 					durationRest -= time.Second
 					if durationRest < 0 {
+						_ = s.Beep()
 						break
 					}
 				}
-				//_ = s.Beep()
-				//break
 			}
 		}
 	}()

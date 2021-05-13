@@ -8,6 +8,10 @@ A simple terminal based digital timer written in Go to use as a Pomodoro time.
 
 ![gotimer](gotimer.png)
 
+## With resting option
+
+![gotimer with rest](gotimer_rest.png)
+
 ## Usage:
 
 ```bash
