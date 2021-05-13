@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/nwillc/gotimer/gen/version"
 	"github.com/nwillc/gotimer/setup"
 	"github.com/nwillc/gotimer/typeface"
 	"github.com/nwillc/gotimer/utils"
-	"os"
-	"time"
 )
 
 func main() {
@@ -23,8 +24,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	durationRest, err := time.ParseDuration(*flags.TimeRest)
+	if err != nil {
+		panic(err)
+	}
+	restEnabled := *flags.TimeRest != "0s"
 
 	color := tcell.ColorNames[*flags.ColorName]
+	colorRest := tcell.ColorNames[*flags.ColorNameRest]
 	var s tcell.Screen
 	if s, err = tcell.NewScreen(); err != nil {
 		panic(err)
@@ -42,11 +49,18 @@ func main() {
 			if paused {
 				continue
 			}
-			display(duration, s, color, *flags.FontName)
-			duration -= time.Second
-			if duration < 0 {
-				_ = s.Beep()
-				break
+			display(duration, durationRest, s, color, colorRest, *flags.FontName, restEnabled)
+			if duration >= time.Second {
+				duration -= time.Second
+			}
+			if duration <= 0 {
+				if durationRest >= time.Second {
+					durationRest -= time.Second
+					if durationRest < 0 {
+						_ = s.Beep()
+						break
+					}
+				}
 			}
 		}
 	}()
@@ -65,19 +79,28 @@ func main() {
 	}
 }
 
-func display(duration time.Duration, s tcell.Screen, color tcell.Color, fontName string) {
+func display(duration time.Duration, durationRest time.Duration, s tcell.Screen, color tcell.Color, colorRest tcell.Color, fontName string, restEnabled bool) {
+	var width int
 	font, ok := typeface.AvailableFonts[fontName]
 	if !ok {
 		panic("font not available")
 	}
 	s.Clear()
-	str, err := utils.Format(duration)
+	str, err := utils.Format(duration, durationRest, restEnabled)
 	if err != nil {
 		panic(err)
 	}
 	x := 1
+	state := "work"
 	for _, c := range str {
-		width, err := typeface.RenderRune(s, c, font, color, x, 1)
+		if c == ' ' {
+			state = "rest"
+		}
+		if state == "work" {
+			width, err = typeface.RenderRune(s, c, font, color, x, 1)
+		} else {
+			width, err = typeface.RenderRune(s, c, font, colorRest, x, 1)
+		}
 		if err != nil {
 			panic(err)
 		}
