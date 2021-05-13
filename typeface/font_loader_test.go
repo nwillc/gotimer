@@ -1,12 +1,13 @@
 package typeface
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBitmaps(t *testing.T) {
-	count := 12
+	count := 13
 	assert.NotNil(t, bitmaps)
 
 	type args struct {
