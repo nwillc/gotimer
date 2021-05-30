@@ -14,17 +14,28 @@
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package typeface
+package display
 
 import (
-	"github.com/gdamore/tcell/v2"
-	"github.com/stretchr/testify/assert"
-	"testing"
+	"fmt"
+	"strings"
+	"time"
 )
 
-func TestRenderRuneBadRune(t *testing.T) {
-	font, ok := AvailableFonts["6"]
-	assert.True(t, ok)
-	_, err := RenderRune(nil, 'P', font, tcell.ColorYellow, 0, 0)
-	assert.Error(t, err)
+// Format a time.Duration into a string for the format `HH:MM.SS`.
+func Format(d time.Duration) (string, error) {
+	var sb strings.Builder
+
+	if d >= time.Hour {
+		sb.WriteString(fmt.Sprintf("%02d:", int(d.Hours())))
+	}
+
+	if d >= time.Minute {
+		d %= time.Hour
+		sb.WriteString(fmt.Sprintf("%02d.", int(d.Minutes())))
+	}
+
+	d %= time.Minute
+	sb.WriteString(fmt.Sprintf("%02d", int(d.Seconds())))
+	return sb.String(), nil
 }
