@@ -23,7 +23,7 @@ import (
 	"time"
 )
 
-func Timer(duration time.Duration, color tcell.Color, fontName string) {
+func Timer(duration time.Duration, color tcell.Color, font typeface.Font) {
 	var s tcell.Screen
 	var err error
 	if s, err = tcell.NewScreen(); err != nil {
@@ -36,13 +36,14 @@ func Timer(duration time.Duration, color tcell.Color, fontName string) {
 
 	// paused indicates timer is paused
 	var paused = false
+	// Display the timer
 	go func() {
 		for {
 			time.Sleep(time.Second)
 			if paused {
 				continue
 			}
-			display(duration, s, color, fontName)
+			display(duration, s, color, font)
 			duration -= time.Second
 			if duration < 0 {
 				_ = s.Beep()
@@ -50,7 +51,7 @@ func Timer(duration time.Duration, color tcell.Color, fontName string) {
 			}
 		}
 	}()
-
+	// keyboard event processing
 	for {
 		ev := s.PollEvent()
 		switch et := ev.(type) {
@@ -65,11 +66,7 @@ func Timer(duration time.Duration, color tcell.Color, fontName string) {
 	}
 }
 
-func display(duration time.Duration, s tcell.Screen, color tcell.Color, fontName string) {
-	font, ok := typeface.AvailableFonts[fontName]
-	if !ok {
-		panic("font not available")
-	}
+func display(duration time.Duration, s tcell.Screen, color tcell.Color, font typeface.Font) {
 	s.Clear()
 	str, err := Format(duration)
 	if err != nil {

@@ -21,8 +21,11 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/nwillc/gotimer/display"
 	"github.com/nwillc/gotimer/gen/version"
+	"github.com/nwillc/gotimer/typeface"
 	"github.com/spf13/cobra"
 	"os"
+	"sort"
+	"strings"
 	"time"
 )
 
@@ -34,10 +37,10 @@ var cliValues struct {
 }
 
 func init() {
-	RootCmd.PersistentFlags().BoolVarP(&cliValues.Version, "version", "v", false, "Display version.")
-	RootCmd.PersistentFlags().StringVarP(&cliValues.Time, "time", "t", "25m", "Time to count down.")
-	RootCmd.PersistentFlags().StringVarP(&cliValues.ColorName, "color", "c", "orangered", "Color of timer.")
-	RootCmd.PersistentFlags().StringVarP(&cliValues.FontName, "font", "f", "7", "Font to use.")
+	RootCmd.PersistentFlags().BoolVarP(&cliValues.Version, "version", "v", false, "Display version")
+	RootCmd.PersistentFlags().StringVarP(&cliValues.Time, "time", "t", "25m", "Time to count down")
+	RootCmd.PersistentFlags().StringVarP(&cliValues.ColorName, "color", "c", "orangered", "Color of timer")
+	RootCmd.PersistentFlags().StringVarP(&cliValues.FontName, "font", "f", "7", "Font size to use")
 }
 
 var RootCmd = &cobra.Command{
@@ -45,19 +48,46 @@ var RootCmd = &cobra.Command{
 	Short: "A digital count down timer",
 	Long:  "A simple terminal based digital count down timer, may be used as a Pomodoro timer.",
 	Args:  cobra.ExactArgs(0),
-	Run: func(cmd *cobra.Command, args []string) {
-		if cliValues.Version {
-			fmt.Println("Version:", version.Version)
-			os.Exit(0)
-		}
-		duration, err := time.ParseDuration(cliValues.Time)
-		if err != nil {
-			panic(err)
-		}
-		color, ok := tcell.ColorNames[cliValues.ColorName]
-		if !ok {
-			panic(fmt.Errorf("unknown color %s", cliValues.ColorName))
-		}
-		display.Timer(duration, color, cliValues.FontName)
-	},
+	Run:   timerCmd,
+}
+
+func timerCmd(_ *cobra.Command, _ []string) {
+	if cliValues.Version {
+		fmt.Println("Version:", version.Version)
+		os.Exit(0)
+	}
+	duration, err := time.ParseDuration(cliValues.Time)
+	if err != nil {
+		fmt.Println("Illegal time:", err)
+		fmt.Println("A time ia a sequence of decimal numbers, each with optional fraction and a unit suffix,")
+		fmt.Println(`such as ".5h", "1m35s" or "2h45m". Valid time units are "s", "m", "h".`)
+		os.Exit(1)
+	}
+	color, ok := tcell.ColorNames[cliValues.ColorName]
+	if !ok {
+		fmt.Println("Unknown color:", cliValues.ColorName)
+		fmt.Println("Available colors:", colors(tcell.ColorNames))
+		os.Exit(1)
+	}
+	font, ok := typeface.AvailableFonts[cliValues.FontName]
+	if !ok {
+		fmt.Println("Unknown font:", cliValues.FontName)
+		fmt.Println("Available fonts:", fonts(typeface.FontNames))
+		os.Exit(1)
+	}
+	display.Timer(duration, color, font)
+}
+
+func colors(colorNames map[string]tcell.Color) string {
+	var names []string
+	for name := range colorNames {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return strings.Join(names, ", ")
+}
+
+func fonts(names []string) string {
+	sort.Strings(names)
+	return strings.Join(names, ", ")
 }
