@@ -43,6 +43,7 @@ func init() {
 	RootCmd.PersistentFlags().StringVarP(&cliValues.FontName, "font", "f", "7", "Font size to use")
 }
 
+// RootCmd is the root, and only, command of gotimer.
 var RootCmd = &cobra.Command{
 	Use:   "gotimer",
 	Short: "A digital count down timer",
