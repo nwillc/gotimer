@@ -25,12 +25,12 @@ import (
 
 // Timer runs for given time.Duration, tcell.Color, and typeface.Font.
 func Timer(duration time.Duration, color tcell.Color, font typeface.Font) {
+	// Prepare the display
 	var s tcell.Screen
 	var err error
 	if s, err = tcell.NewScreen(); err != nil {
 		panic(err)
 	}
-
 	if err := s.Init(); err != nil {
 		panic(err)
 	}
@@ -38,26 +38,23 @@ func Timer(duration time.Duration, color tcell.Color, font typeface.Font) {
 	// paused indicates timer is paused
 	var paused = false
 	// Display the timer
-	go func() {
-		for {
-			time.Sleep(time.Second)
-			if paused {
-				continue
-			}
-			display(duration, s, color, font)
-			duration -= time.Second
-			if duration < 0 {
-				_ = s.Beep()
-				break
-			}
+	stop := RepeatUntilStopped(time.Second, func() {
+		if paused || duration < 0 {
+			return
 		}
-	}()
-	// keyboard event processing
+		display(duration, s, color, font)
+		duration -= time.Second
+		if duration < 0 {
+			_ = s.Beep()
+		}
+	})
+	// Process keyboard
 	for {
 		ev := s.PollEvent()
 		switch et := ev.(type) {
 		case *tcell.EventKey:
 			if et.Key() == tcell.KeyEscape || et.Key() == tcell.KeyCtrlC {
+				stop <- true
 				s.Fini()
 				os.Exit(0)
 			} else if et.Rune() == ' ' {

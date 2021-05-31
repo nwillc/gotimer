@@ -25,6 +25,7 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -73,7 +74,7 @@ func timerCmd(_ *cobra.Command, _ []string) {
 	font, ok := typeface.AvailableFonts[cliValues.FontName]
 	if !ok {
 		fmt.Println("Unknown font:", cliValues.FontName)
-		fmt.Println("Available fonts:", fonts(typeface.FontNames))
+		fmt.Println("Available font sizes:", fonts(typeface.FontNames))
 		os.Exit(1)
 	}
 	display.Timer(duration, color, font)
@@ -89,6 +90,10 @@ func colors(colorNames map[string]tcell.Color) string {
 }
 
 func fonts(names []string) string {
-	sort.Strings(names)
+	sort.Slice(names, func(i, j int) bool {
+		ii, _ := strconv.Atoi(names[i])
+		jj, _ := strconv.Atoi(names[j])
+		return ii < jj
+	})
 	return strings.Join(names, ", ")
 }
