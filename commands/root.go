@@ -18,16 +18,17 @@ package commands
 
 import (
 	"fmt"
-	"github.com/gdamore/tcell/v2"
-	"github.com/nwillc/gotimer/display"
-	"github.com/nwillc/gotimer/gen/version"
-	"github.com/nwillc/gotimer/typeface"
-	"github.com/spf13/cobra"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gdamore/tcell/v2"
+	"github.com/nwillc/gotimer/display"
+	"github.com/nwillc/gotimer/gen/version"
+	"github.com/nwillc/gotimer/typeface"
+	"github.com/spf13/cobra"
 )
 
 var cliValues struct {

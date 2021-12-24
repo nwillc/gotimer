@@ -19,95 +19,72 @@ package typeface
 import (
 	"embed"
 	"fmt"
+	"github.com/nwillc/genfuncs"
+	"io/fs"
 	"strconv"
 	"strings"
 )
 
 const blackPixel = 35
 
-//go:embed bitmaps/*/*.txt
-var bitmaps embed.FS
+var (
+	//go:embed bitmaps/*/*.txt
+	bitmaps embed.FS
 
-// AvailableFonts is a map of available Font by name.
-var AvailableFonts map[string]Font
+	// AvailableFonts is a map of available Font by name.
+	AvailableFonts map[string]Font
 
-// FontNames available in the app
-var FontNames []string
+	// FontNames available in the app
+	FontNames []string
+)
 
 func init() {
 	FontNames = fontNames(bitmaps)
-	AvailableFonts = make(map[string]Font)
-	for _, name := range FontNames {
-		m, err := readBitmaps(bitmaps, "bitmaps/"+name)
-		if err != nil {
-			panic("Could not load bitmaps " + err.Error())
-		}
-		AvailableFonts[name] = m
-	}
+	AvailableFonts = genfuncs.AssociateWith(FontNames, func(n string) Font { return readBitmaps(bitmaps, "bitmaps/"+n) })
 }
 
-func readBitmaps(fs embed.FS, path string) (Font, error) {
-	runes := make(map[rune]FontRune)
-	files, err := fs.ReadDir(path)
+func readBitmaps(embedFs embed.FS, path string) Font {
+	files, err := embedFs.ReadDir(path)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	for _, file := range files {
-		r, err := toFontRune(fs, path, file.Name())
-		if err != nil {
-			return nil, err
-		}
-		name, err := toCharName(file.Name())
-		if err != nil {
-			return nil, err
-		}
-		runes[name] = r
-	}
-	return runes, nil
+	return genfuncs.Associate(files, func(f fs.DirEntry) (rune, FontRune) {
+		return toCharName(f.Name()), toFontRune(embedFs, path, f.Name())
+	})
 }
 
-func toFontRune(fs embed.FS, fontName string, name string) (FontRune, error) {
+func toFontRune(fs embed.FS, fontName string, name string) FontRune {
 	txt, err := fs.ReadFile(fontName + "/" + name)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	lines := strings.Split(string(txt), "\n")
-	var fr [][]bool
-	for _, line := range lines {
-		if len(line) < 3 {
-			continue
-		}
-		var l []bool
-		for _, c := range line {
-			l = append(l, c == blackPixel)
-		}
-		fr = append(fr, l)
-	}
-	return fr, nil
+	return genfuncs.Map(
+		genfuncs.Map(
+			genfuncs.Filter(
+				strings.Split(string(txt), "\n"),
+				func(l string) bool { return len(l) > 2 }),
+			func(s string) []rune { return []rune(s) }),
+		func(rs []rune) []bool { return genfuncs.Map(rs, func(r rune) bool { return r == blackPixel }) })
 }
 
-func toCharName(path string) (rune, error) {
+func toCharName(path string) rune {
 	parts := strings.Split(path, ".")
 	if len(parts) != 2 {
-		return rune(-1), fmt.Errorf("malformed parts %d", len(parts))
+		panic(fmt.Errorf("malformed parts %d", len(parts)))
 	}
 	name := (parts[0])[1:]
 	ascii, err := strconv.Atoi(name)
 	if err != nil {
-		return rune(-1), err
+		panic(err)
 	}
 	r := rune(ascii)
-	return r, nil
+	return r
 }
 
-func fontNames(fs embed.FS) []string {
-	var names []string
-	entries, _ := fs.ReadDir("bitmaps")
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
-		}
-		names = append(names, entry.Name())
-	}
-	return names
+func fontNames(efs embed.FS) []string {
+	entries, _ := efs.ReadDir("bitmaps")
+	return genfuncs.Map(
+		genfuncs.Filter(
+			entries, func(e fs.DirEntry) bool { return e.IsDir() }),
+		func(e fs.DirEntry) string { return e.Name() })
 }

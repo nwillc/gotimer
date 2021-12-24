@@ -17,10 +17,11 @@
 package display
 
 import (
-	"github.com/gdamore/tcell/v2"
-	"github.com/nwillc/gotimer/typeface"
 	"os"
 	"time"
+
+	"github.com/gdamore/tcell/v2"
+	"github.com/nwillc/gotimer/typeface"
 )
 
 // Timer runs for given time.Duration, tcell.Color, and typeface.Font.

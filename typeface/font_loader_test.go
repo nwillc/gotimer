@@ -17,8 +17,9 @@
 package typeface
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBitmaps(t *testing.T) {
@@ -38,8 +39,7 @@ func TestBitmaps(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			runes, err := readBitmaps(bitmaps, "bitmaps/"+tt.args.font)
-			assert.NoError(t, err)
+			runes := readBitmaps(bitmaps, "bitmaps/"+tt.args.font)
 			assert.NotNil(t, runes)
 			assert.Equal(t, count, len(runes))
 			for i := 0; i < 10; i++ {
@@ -52,7 +52,6 @@ func TestBitmaps(t *testing.T) {
 }
 
 func TestToCharName(t *testing.T) {
-	r, err := toCharName("a48.txt")
-	assert.NoError(t, err)
+	r := toCharName("a48.txt")
 	assert.Equal(t, '0', r)
 }

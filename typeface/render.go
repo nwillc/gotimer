@@ -18,6 +18,7 @@ package typeface
 
 import (
 	"fmt"
+
 	"github.com/gdamore/tcell/v2"
 )
 

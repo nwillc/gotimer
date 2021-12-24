@@ -18,9 +18,10 @@ package typeface
 
 import (
 	_ "embed"
-	"github.com/gdamore/tcell/v2"
 	"reflect"
 	"testing"
+
+	"github.com/gdamore/tcell/v2"
 )
 
 func TestRenderRune(t *testing.T) {

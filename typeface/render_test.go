@@ -17,9 +17,10 @@
 package typeface
 
 import (
+	"testing"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestRenderRuneBadRune(t *testing.T) {
