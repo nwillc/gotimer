@@ -18,10 +18,8 @@ package commands
 
 import (
 	"fmt"
+	"github.com/nwillc/genfuncs"
 	"os"
-	"sort"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
@@ -82,19 +80,13 @@ func timerCmd(_ *cobra.Command, _ []string) {
 }
 
 func colors(colorNames map[string]tcell.Color) string {
-	var names []string
-	for name := range colorNames {
-		names = append(names, name)
-	}
-	sort.Strings(names)
-	return strings.Join(names, ", ")
+	var names = genfuncs.Keys(colorNames)
+	names = genfuncs.Filter(names, func(s string) bool { return s != "" })
+	genfuncs.Sort(names, genfuncs.OrderedComparator[string]())
+	return genfuncs.JoinToString(names, func(s string) string { return s }, "\n  ", "\n  ", "")
 }
 
 func fonts(names []string) string {
-	sort.Slice(names, func(i, j int) bool {
-		ii, _ := strconv.Atoi(names[i])
-		jj, _ := strconv.Atoi(names[j])
-		return ii < jj
-	})
-	return strings.Join(names, ", ")
+	genfuncs.Sort(names, genfuncs.OrderedComparator[string]())
+	return genfuncs.JoinToString(names, func(s string) string { return s }, "\n  ", "\n  ", "")
 }
