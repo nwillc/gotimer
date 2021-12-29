@@ -19,6 +19,7 @@ package commands
 import (
 	"fmt"
 	"github.com/nwillc/genfuncs"
+	"github.com/nwillc/gotimer/generics"
 	"os"
 	"time"
 
@@ -29,18 +30,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cliValues struct {
-	Version   bool
-	Time      string
-	ColorName string
-	FontName  string
-}
+var (
+	cliValues struct {
+		Version   bool
+		Time      string
+		ColorName string
+		FontName  string
+	}
+)
 
 func init() {
 	RootCmd.PersistentFlags().BoolVarP(&cliValues.Version, "version", "v", false, "Display version")
 	RootCmd.PersistentFlags().StringVarP(&cliValues.Time, "time", "t", "25m", "Time to count down")
 	RootCmd.PersistentFlags().StringVarP(&cliValues.ColorName, "color", "c", "orangered", "Color of timer")
-	RootCmd.PersistentFlags().StringVarP(&cliValues.FontName, "font", "f", "7", "Font size to use")
+	RootCmd.PersistentFlags().StringVarP(&cliValues.FontName, "size", "s", "7", "Font size to use")
 }
 
 // RootCmd is the root, and only, command of gotimer.
@@ -80,13 +83,15 @@ func timerCmd(_ *cobra.Command, _ []string) {
 }
 
 func colors(colorNames map[string]tcell.Color) string {
-	var names = genfuncs.Keys(colorNames)
-	names = genfuncs.Filter(names, func(s string) bool { return s != "" })
-	genfuncs.Sort(names, genfuncs.OrderedComparator[string]())
-	return genfuncs.JoinToString(names, func(s string) string { return s }, "\n  ", "\n  ", "")
+	return genfuncs.
+		Keys(colorNames).
+		Filter(generics.NotBlank).
+		SortBy(generics.LexicalOrder).
+		JoinToString(generics.AToA, "\n  ", "\n  ", "")
 }
 
-func fonts(names []string) string {
-	genfuncs.Sort(names, genfuncs.OrderedComparator[string]())
-	return genfuncs.JoinToString(names, func(s string) string { return s }, "\n  ", "\n  ", "")
+func fonts(names genfuncs.Slice[string]) string {
+	return genfuncs.Map(names, generics.AToi).
+		SortBy(generics.NumericOrder).
+		JoinToString(generics.IToA, "\n  ", "\n  ", "")
 }

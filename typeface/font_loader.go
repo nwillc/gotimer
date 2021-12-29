@@ -36,11 +36,19 @@ var (
 
 	// FontNames available in the app
 	FontNames []string
+
+	entryIsDir   genfuncs.Predicate[fs.DirEntry]        = func(e fs.DirEntry) bool { return e.IsDir() }
+	entryName    genfuncs.Function[fs.DirEntry, string] = func(e fs.DirEntry) string { return e.Name() }
+	hasData      genfuncs.Predicate[string]             = func(l string) bool { return len(l) > 2 }
+	toRuneSlice  genfuncs.Function[string, []rune]      = func(s string) []rune { return []rune(s) }
+	toPixel      genfuncs.Function[rune, bool]          = func(r rune) bool { return r == blackPixel }
+	toPixelSlice genfuncs.Function[[]rune, []bool]      = func(rs []rune) []bool { return genfuncs.Map(rs, toPixel) }
+	toFont       genfuncs.ValueFor[string, Font]        = func(n string) Font { return readBitmaps(bitmaps, "bitmaps/"+n) }
 )
 
 func init() {
 	FontNames = fontNames(bitmaps)
-	AvailableFonts = genfuncs.AssociateWith(FontNames, func(n string) Font { return readBitmaps(bitmaps, "bitmaps/"+n) })
+	AvailableFonts = genfuncs.AssociateWith(FontNames, toFont)
 }
 
 func readBitmaps(embedFs embed.FS, path string) Font {
@@ -48,9 +56,10 @@ func readBitmaps(embedFs embed.FS, path string) Font {
 	if err != nil {
 		panic(err)
 	}
-	return genfuncs.Associate(files, func(f fs.DirEntry) (rune, FontRune) {
+	toFontRuneKV := func(f fs.DirEntry) (rune, FontRune) {
 		return toCharName(f.Name()), toFontRune(embedFs, path, f.Name())
-	})
+	}
+	return genfuncs.Associate(files, toFontRuneKV)
 }
 
 func toFontRune(fs embed.FS, fontName string, name string) FontRune {
@@ -58,13 +67,8 @@ func toFontRune(fs embed.FS, fontName string, name string) FontRune {
 	if err != nil {
 		panic(err)
 	}
-	return genfuncs.Map(
-		genfuncs.Map(
-			genfuncs.Filter(
-				strings.Split(string(txt), "\n"),
-				func(l string) bool { return len(l) > 2 }),
-			func(s string) []rune { return []rune(s) }),
-		func(rs []rune) []bool { return genfuncs.Map(rs, func(r rune) bool { return r == blackPixel }) })
+	var lines = genfuncs.Slice[string](strings.Split(string(txt), "\n")).Filter(hasData)
+	return [][]bool(genfuncs.Map(genfuncs.Map(lines, toRuneSlice), toPixelSlice))
 }
 
 func toCharName(path string) rune {
@@ -82,9 +86,7 @@ func toCharName(path string) rune {
 }
 
 func fontNames(efs embed.FS) []string {
-	entries, _ := efs.ReadDir("bitmaps")
-	return genfuncs.Map(
-		genfuncs.Filter(
-			entries, func(e fs.DirEntry) bool { return e.IsDir() }),
-		func(e fs.DirEntry) string { return e.Name() })
+	var entries genfuncs.Slice[fs.DirEntry]
+	entries, _ = efs.ReadDir("bitmaps")
+	return genfuncs.Map(entries.Filter(entryIsDir), entryName)
 }
