@@ -19,6 +19,7 @@ package commands
 import (
 	"fmt"
 	"github.com/nwillc/genfuncs"
+	"github.com/nwillc/genfuncs/gentype"
 	"github.com/nwillc/gotimer/generics"
 	"os"
 	"time"
@@ -83,15 +84,15 @@ func timerCmd(_ *cobra.Command, _ []string) {
 }
 
 func colors(colorNames map[string]tcell.Color) string {
-	return genfuncs.
+	return gentype.
 		Keys(colorNames).
-		Filter(generics.NotBlank).
-		SortBy(generics.LexicalOrder).
+		Filter(genfuncs.IsNotBlank).
+		SortBy(genfuncs.SLexicalOrder).
 		JoinToString(generics.AToA, "\n  ", "\n  ", "")
 }
 
-func fonts(names genfuncs.Slice[string]) string {
-	return genfuncs.Map(names, generics.AToi).
-		SortBy(generics.NumericOrder).
+func fonts(names gentype.Slice[string]) string {
+	return gentype.Map(names, generics.AToi).
+		SortBy(genfuncs.INumericOrder).
 		JoinToString(generics.IToA, "\n  ", "\n  ", "")
 }

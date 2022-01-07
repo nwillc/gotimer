@@ -17,15 +17,11 @@
 package generics
 
 import (
-	"github.com/nwillc/genfuncs"
 	"strconv"
 )
 
 var (
-	AToA         = func(s string) string { return s }
-	AToi         = func(s string) int { i, _ := strconv.Atoi(s); return i }
-	IToA         = func(i int) string { return strconv.Itoa(i) }
-	LexicalOrder = genfuncs.OrderedComparator[string]()
-	NotBlank     = genfuncs.IsEqualTo("").Not()
-	NumericOrder = genfuncs.OrderedComparator[int]()
+	AToA = func(s string) string { return s }
+	AToi = func(s string) int { i, _ := strconv.Atoi(s); return i }
+	IToA = func(i int) string { return strconv.Itoa(i) }
 )

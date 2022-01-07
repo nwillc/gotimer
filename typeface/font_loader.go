@@ -20,6 +20,7 @@ import (
 	"embed"
 	"fmt"
 	"github.com/nwillc/genfuncs"
+	"github.com/nwillc/genfuncs/gentype"
 	"io/fs"
 	"strconv"
 	"strings"
@@ -42,13 +43,13 @@ var (
 	hasData      genfuncs.Predicate[string]             = func(l string) bool { return len(l) > 2 }
 	toRuneSlice  genfuncs.Function[string, []rune]      = func(s string) []rune { return []rune(s) }
 	toPixel      genfuncs.Function[rune, bool]          = func(r rune) bool { return r == blackPixel }
-	toPixelSlice genfuncs.Function[[]rune, []bool]      = func(rs []rune) []bool { return genfuncs.Map(rs, toPixel) }
+	toPixelSlice genfuncs.Function[[]rune, []bool]      = func(rs []rune) []bool { return gentype.Map(rs, toPixel) }
 	toFont       genfuncs.ValueFor[string, Font]        = func(n string) Font { return readBitmaps(bitmaps, "bitmaps/"+n) }
 )
 
 func init() {
 	FontNames = fontNames(bitmaps)
-	AvailableFonts = genfuncs.AssociateWith(FontNames, toFont)
+	AvailableFonts = gentype.AssociateWith(FontNames, toFont)
 }
 
 func readBitmaps(embedFs embed.FS, path string) Font {
@@ -59,7 +60,7 @@ func readBitmaps(embedFs embed.FS, path string) Font {
 	toFontRuneKV := func(f fs.DirEntry) (rune, FontRune) {
 		return toCharName(f.Name()), toFontRune(embedFs, path, f.Name())
 	}
-	return genfuncs.Associate(files, toFontRuneKV)
+	return gentype.Associate(files, toFontRuneKV)
 }
 
 func toFontRune(fs embed.FS, fontName string, name string) FontRune {
@@ -67,8 +68,8 @@ func toFontRune(fs embed.FS, fontName string, name string) FontRune {
 	if err != nil {
 		panic(err)
 	}
-	var lines = genfuncs.Slice[string](strings.Split(string(txt), "\n")).Filter(hasData)
-	return [][]bool(genfuncs.Map(genfuncs.Map(lines, toRuneSlice), toPixelSlice))
+	var lines = gentype.Slice[string](strings.Split(string(txt), "\n")).Filter(hasData)
+	return [][]bool(gentype.Map(gentype.Map(lines, toRuneSlice), toPixelSlice))
 }
 
 func toCharName(path string) rune {
@@ -86,7 +87,7 @@ func toCharName(path string) rune {
 }
 
 func fontNames(efs embed.FS) []string {
-	var entries genfuncs.Slice[fs.DirEntry]
+	var entries gentype.Slice[fs.DirEntry]
 	entries, _ = efs.ReadDir("bitmaps")
-	return genfuncs.Map(entries.Filter(entryIsDir), entryName)
+	return gentype.Map(entries.Filter(entryIsDir), entryName)
 }
