@@ -18,6 +18,7 @@ package commands
 
 import (
 	"fmt"
+	"github.com/nwillc/genfuncs/container/gslices"
 	"os"
 	"time"
 
@@ -84,16 +85,16 @@ func timerCmd(_ *cobra.Command, _ []string) {
 	display.Timer(duration, color, font)
 }
 
-func colors(colorNames map[string]tcell.Color) string {
-	return container.
-		Keys(colorNames).
+func colors(colorNames container.GMap[string, tcell.Color]) string {
+	return colorNames.
+		Keys().
 		Filter(genfuncs.IsNotBlank).
-		SortBy(genfuncs.SLexicalOrder).
+		SortBy(genfuncs.LessOrdered[string]).
 		JoinToString(generics.AToA, "\n  ", "\n  ", "")
 }
 
-func fonts(names container.Slice[string]) string {
-	return container.Map(names, generics.AToi).
-		SortBy(genfuncs.INumericOrder).
+func fonts(names container.GSlice[string]) string {
+	return gslices.Map(names, generics.AToi).
+		SortBy(genfuncs.LessOrdered[int]).
 		JoinToString(generics.IToA, "\n  ", "\n  ", "")
 }

@@ -19,6 +19,7 @@ package typeface
 import (
 	"embed"
 	"fmt"
+	"github.com/nwillc/genfuncs/container/gslices"
 	"io/fs"
 	"strconv"
 	"strings"
@@ -44,13 +45,13 @@ var (
 	hasData      genfuncs.Function[string, bool]        = func(l string) bool { return len(l) > 2 }
 	toRuneSlice  genfuncs.Function[string, []rune]      = func(s string) []rune { return []rune(s) }
 	toPixel      genfuncs.Function[rune, bool]          = func(r rune) bool { return r == blackPixel }
-	toPixelSlice genfuncs.Function[[]rune, []bool]      = func(rs []rune) []bool { return container.Map(rs, toPixel) }
+	toPixelSlice genfuncs.Function[[]rune, []bool]      = func(rs []rune) []bool { return gslices.Map(rs, toPixel) }
 	toFont       genfuncs.MapValueFor[string, Font]     = func(n string) Font { return readBitmaps(bitmaps, "bitmaps/"+n) }
 )
 
 func init() {
 	FontNames = fontNames(bitmaps)
-	AvailableFonts = container.AssociateWith(FontNames, toFont)
+	AvailableFonts = gslices.AssociateWith(FontNames, toFont)
 }
 
 func readBitmaps(embedFs embed.FS, path string) Font {
@@ -61,7 +62,7 @@ func readBitmaps(embedFs embed.FS, path string) Font {
 	toFontRuneKV := func(f fs.DirEntry) (rune, FontRune) {
 		return toCharName(f.Name()), toFontRune(embedFs, path, f.Name())
 	}
-	return container.Associate(files, toFontRuneKV)
+	return Font(gslices.Associate(files, toFontRuneKV))
 }
 
 func toFontRune(fs embed.FS, fontName string, name string) FontRune {
@@ -69,8 +70,8 @@ func toFontRune(fs embed.FS, fontName string, name string) FontRune {
 	if err != nil {
 		panic(err)
 	}
-	var lines = container.Slice[string](strings.Split(string(txt), "\n")).Filter(hasData)
-	return [][]bool(container.Map(container.Map(lines, toRuneSlice), toPixelSlice))
+	var lines = container.GSlice[string](strings.Split(string(txt), "\n")).Filter(hasData)
+	return [][]bool(gslices.Map(gslices.Map(lines, toRuneSlice), toPixelSlice))
 }
 
 func toCharName(path string) rune {
@@ -88,7 +89,7 @@ func toCharName(path string) rune {
 }
 
 func fontNames(efs embed.FS) []string {
-	var entries container.Slice[fs.DirEntry]
+	var entries container.GSlice[fs.DirEntry]
 	entries, _ = efs.ReadDir("bitmaps")
-	return container.Map(entries.Filter(entryIsDir), entryName)
+	return gslices.Map(entries.Filter(entryIsDir), entryName)
 }
