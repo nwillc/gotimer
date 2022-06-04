@@ -26,6 +26,6 @@ import (
 func TestRenderRuneBadRune(t *testing.T) {
 	font, ok := AvailableFonts["6"]
 	assert.True(t, ok)
-	_, err := RenderRune(nil, 'P', font, tcell.ColorYellow, 0, 0)
-	assert.Error(t, err)
+	result := RenderRune(nil, 'P', font, tcell.ColorYellow, 0, 0)
+	assert.Error(t, result.Error())
 }

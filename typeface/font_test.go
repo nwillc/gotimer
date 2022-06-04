@@ -43,12 +43,12 @@ func TestRenderRune(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := RenderRune(tt.args.s, tt.args.r, tt.args.font, tt.args.c, tt.args.x, tt.args.y)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("RenderRune() error = %v, wantErr %v", err, tt.wantErr)
+			got := RenderRune(tt.args.s, tt.args.r, tt.args.font, tt.args.c, tt.args.x, tt.args.y)
+			if (!got.Ok()) != tt.wantErr {
+				t.Errorf("RenderRune() error = %v, wantErr %v", got.Error(), tt.wantErr)
 				return
 			}
-			if got != tt.want {
+			if got.ValueOr(0) != tt.want {
 				t.Errorf("RenderRune() got = %v, want %v", got, tt.want)
 			}
 		})

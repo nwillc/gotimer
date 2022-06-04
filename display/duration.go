@@ -18,12 +18,13 @@ package display
 
 import (
 	"fmt"
+	"github.com/nwillc/gotimer/generics"
 	"strings"
 	"time"
 )
 
 // Format a time.Duration into a string for the format `HH:MM.SS`.
-func Format(d time.Duration) (string, error) {
+func Format(d time.Duration) *generics.Result[string] {
 	var sb strings.Builder
 
 	if d >= time.Hour {
@@ -37,5 +38,5 @@ func Format(d time.Duration) (string, error) {
 
 	d %= time.Minute
 	sb.WriteString(fmt.Sprintf("%02d", int(d.Seconds())))
-	return sb.String(), nil
+	return generics.NewResult(sb.String())
 }

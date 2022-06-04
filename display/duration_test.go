@@ -76,12 +76,12 @@ func TestFormat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Format(tt.args.duration)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Format() error = %v, wantErr %v", err, tt.wantErr)
+			got := Format(tt.args.duration)
+			if (!got.Ok()) != tt.wantErr {
+				t.Errorf("Format() error = %v, wantErr %v", got.Error(), tt.wantErr)
 				return
 			}
-			if got != tt.want {
+			if got.ValueOr("") != tt.want {
 				t.Errorf("Format() got = %v, want %v", got, tt.want)
 			}
 		})

@@ -67,17 +67,11 @@ func Timer(duration time.Duration, color tcell.Color, font typeface.Font) {
 
 func display(duration time.Duration, s tcell.Screen, color tcell.Color, font typeface.Font) {
 	s.Clear()
-	str, err := Format(duration)
-	if err != nil {
-		panic(err)
-	}
+	str := Format(duration)
 	x := 1
-	for _, c := range str {
-		width, err := typeface.RenderRune(s, c, font, color, x, 1)
-		if err != nil {
-			panic(err)
-		}
-		x += width + 1
+	for _, c := range str.ValueOrPanic() {
+		width := typeface.RenderRune(s, c, font, color, x, 1)
+		x += width.ValueOrPanic() + 1
 	}
 	s.Show()
 }
