@@ -25,6 +25,8 @@ github.com/nwillc/genfuncs v0.14.1 h1:Yc9VnaPrf0+eDKzWuMRf+38cOR/6gNZAks7kicSGk/
 github.com/nwillc/genfuncs v0.14.1/go.mod h1:MoL6QtVLb0vTYzCyKHNRrIrW8Uk9Z93YA/1FGKCASlo=
 github.com/nwillc/genfuncs v0.14.2 h1:wv6yXH1fjX4K91bwSMoo0Go01Augct5aQ0q1kh69IL4=
 github.com/nwillc/genfuncs v0.14.2/go.mod h1:539VTRiSSAunHQ4T3TBgsnG4Mc1hJIjoJs5y3oUVBaM=
+github.com/nwillc/genfuncs v0.14.3 h1:pH6oOrUOsUC2MLfDiFepLWDTopxcmuA+1Aag03ipkdM=
+github.com/nwillc/genfuncs v0.14.3/go.mod h1:539VTRiSSAunHQ4T3TBgsnG4Mc1hJIjoJs5y3oUVBaM=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rivo/uniseg v0.2.0 h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
