@@ -4,11 +4,19 @@
 ---
 # Go Timer
 
-A simple terminal based digital timer written in Go to use as a Pomodoro time.
+A simple terminal based digital timer written in Go to use as a Pomodoro timer.
 
 ![gotimer](gotimer.png)
 
-## Usage:
+## Installation
+
+Install with `go install`:
+
+```bash
+  go install github.com/nwillc/gotimer@latest
+```
+
+## Usage
 
 ```bash
 $ ./gotimer -h
@@ -28,3 +36,9 @@ Flags:
  - The time duration is given in hours, minutes and seconds: `#h#m#s`. 
  - Exit with Ctrl-C or ESC
  - Pause with SPACE
+
+## Tech Stack
+
+**Language:** Go 1.18+
+
+**Packages:** genfuncs, tcell

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021,  nwillc@gmail.com
+ *  Copyright (c) 2022,  nwillc@gmail.com
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -81,7 +81,7 @@ func TestFormat(t *testing.T) {
 				t.Errorf("Format() error = %v, wantErr %v", got.Error(), tt.wantErr)
 				return
 			}
-			if got.ValueOr("") != tt.want {
+			if got.OrElse("") != tt.want {
 				t.Errorf("Format() got = %v, want %v", got, tt.want)
 			}
 		})

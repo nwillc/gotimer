@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021,  nwillc@gmail.com
+ *  Copyright (c) 2022,  nwillc@gmail.com
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -69,9 +69,9 @@ func display(duration time.Duration, s tcell.Screen, color tcell.Color, font typ
 	s.Clear()
 	str := Format(duration)
 	x := 1
-	for _, c := range str.ValueOrPanic() {
+	for _, c := range str.MustGet() {
 		width := typeface.RenderRune(s, c, font, color, x, 1)
-		x += width.ValueOrPanic() + 1
+		x += width.MustGet() + 1
 	}
 	s.Show()
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2021,  nwillc@gmail.com
+ *  Copyright (c) 2022,  nwillc@gmail.com
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -48,7 +48,7 @@ func TestRenderRune(t *testing.T) {
 				t.Errorf("RenderRune() error = %v, wantErr %v", got.Error(), tt.wantErr)
 				return
 			}
-			if got.ValueOr(0) != tt.want {
+			if got.OrElse(0) != tt.want {
 				t.Errorf("RenderRune() got = %v, want %v", got, tt.want)
 			}
 		})
