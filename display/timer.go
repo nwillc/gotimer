@@ -25,7 +25,7 @@ import (
 )
 
 // Timer runs for given time.Duration, tcell.Color, and typeface.Font.
-func Timer(duration time.Duration, color tcell.Color, font typeface.Font) {
+func Timer(duration time.Duration, color tcell.Color, font typeface.Font, eod bool) {
 	// Prepare the display
 	var s tcell.Screen
 	var err error
@@ -47,6 +47,10 @@ func Timer(duration time.Duration, color tcell.Color, font typeface.Font) {
 		duration -= time.Second
 		if duration < 0 {
 			_ = s.Beep()
+			if eod {
+				s.Fini()
+				os.Exit(0)
+			}
 		}
 	})
 	// Process keyboard

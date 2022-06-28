@@ -19,6 +19,7 @@ package commands
 import (
 	"fmt"
 	"github.com/nwillc/genfuncs/container/gslices"
+	"github.com/nwillc/genfuncs/container/sequences"
 	"os"
 	"time"
 
@@ -35,10 +36,11 @@ import (
 
 var (
 	cliValues struct {
-		Version   bool
-		Time      string
-		ColorName string
-		FontName  string
+		Version    bool
+		Time       string
+		ColorName  string
+		FontName   string
+		ExitOnDone bool
 	}
 )
 
@@ -47,6 +49,7 @@ func init() {
 	RootCmd.PersistentFlags().StringVarP(&cliValues.Time, "time", "t", "25m", "Time to count down")
 	RootCmd.PersistentFlags().StringVarP(&cliValues.ColorName, "color", "c", "orangered", "Color of timer")
 	RootCmd.PersistentFlags().StringVarP(&cliValues.FontName, "size", "s", "7", "Font size to use")
+	RootCmd.PersistentFlags().BoolVarP(&cliValues.ExitOnDone, "exit", "x", false, "Exit on completion")
 }
 
 // RootCmd is the root, and only, command of gotimer.
@@ -82,19 +85,19 @@ func timerCmd(_ *cobra.Command, _ []string) {
 		fmt.Println("Available font sizes:", fonts(typeface.FontNames))
 		os.Exit(1)
 	}
-	display.Timer(duration, color, font)
+	display.Timer(duration, color, font, cliValues.ExitOnDone)
 }
 
 func colors(colorNames container.GMap[string, tcell.Color]) string {
-	return colorNames.
+	sortedNames := colorNames.
 		Keys().
 		Filter(genfuncs.IsNotBlank).
-		SortBy(genfuncs.OrderedLess[string]).
-		JoinToString(generics.AToA, "\n  ", "\n  ", "")
+		SortBy(genfuncs.OrderedLess[string])
+	return sequences.JoinToString[string](sortedNames, generics.AToA, "\n  ", "\n  ", "")
 }
 
 func fonts(names container.GSlice[string]) string {
-	return gslices.Map(names, generics.AToi).
-		SortBy(genfuncs.OrderedLess[int]).
-		JoinToString(generics.IToA, "\n  ", "\n  ", "")
+	sortedSizes := gslices.Map(names, generics.AToi).
+		SortBy(genfuncs.OrderedLess[int])
+	return sequences.JoinToString[int](sortedSizes, generics.IToA, "\n  ", "\n  ", "")
 }

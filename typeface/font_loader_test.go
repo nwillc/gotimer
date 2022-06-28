@@ -39,8 +39,9 @@ func TestBitmaps(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			runes := readBitmaps(bitmaps, "bitmaps/"+tt.args.font)
-			assert.NotNil(t, runes)
+			rr := readBitmaps(bitmaps, "bitmaps/"+tt.args.font)
+			assert.True(t, rr.Ok())
+			runes := rr.MustGet()
 			assert.Equal(t, count, len(runes))
 			for i := 0; i < 10; i++ {
 				fr, ok := runes[rune('0'+i)]

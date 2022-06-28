@@ -20,6 +20,8 @@ import (
 	"embed"
 	"fmt"
 	"github.com/nwillc/genfuncs/container/gslices"
+	"github.com/nwillc/genfuncs/container/sequences"
+	"github.com/nwillc/genfuncs/results"
 	"io/fs"
 	"strconv"
 	"strings"
@@ -35,10 +37,10 @@ var (
 	bitmaps embed.FS
 
 	// AvailableFonts is a map of available Font by name.
-	AvailableFonts map[string]Font
+	AvailableFonts container.GMap[string, Font]
 
 	// FontNames available in the app
-	FontNames []string
+	FontNames container.GSlice[string]
 
 	entryIsDir   genfuncs.Function[fs.DirEntry, bool]   = func(e fs.DirEntry) bool { return e.IsDir() }
 	entryName    genfuncs.Function[fs.DirEntry, string] = func(e fs.DirEntry) string { return e.Name() }
@@ -46,32 +48,36 @@ var (
 	toRuneSlice  genfuncs.Function[string, []rune]      = func(s string) []rune { return []rune(s) }
 	toPixel      genfuncs.Function[rune, bool]          = func(r rune) bool { return r == blackPixel }
 	toPixelSlice genfuncs.Function[[]rune, []bool]      = func(rs []rune) []bool { return gslices.Map(rs, toPixel) }
-	toFont       genfuncs.MapValueFor[string, Font]     = func(n string) Font { return readBitmaps(bitmaps, "bitmaps/"+n) }
+	toFont       genfuncs.MapValueFor[string, Font]     = func(n string) *genfuncs.Result[Font] { return readBitmaps(bitmaps, "bitmaps/"+n) }
 )
 
 func init() {
 	FontNames = fontNames(bitmaps)
-	AvailableFonts = gslices.AssociateWith(FontNames, toFont)
+	AvailableFonts = sequences.AssociateWith[string, Font](FontNames, toFont).MustGet()
 }
 
-func readBitmaps(embedFs embed.FS, path string) Font {
-	files, err := embedFs.ReadDir(path)
-	if err != nil {
-		panic(err)
-	}
-	toFontRuneKV := func(f fs.DirEntry) (rune, FontRune) {
-		return toCharName(f.Name()), toFontRune(embedFs, path, f.Name())
-	}
-	return Font(gslices.Associate(files, toFontRuneKV))
+func readBitmaps(embedFs embed.FS, path string) *genfuncs.Result[Font] {
+	result := genfuncs.NewResultError(embedFs.ReadDir(path))
+	var files container.GSlice[fs.DirEntry] = result.MustGet()
+	fMap := sequences.Associate[fs.DirEntry, rune, FontRune](files, func(f fs.DirEntry) (rune, FontRune) {
+		return toCharName(f.Name()), toFontRune(embedFs, path, f.Name()).MustGet()
+	})
+	return genfuncs.NewResult(Font(fMap))
 }
 
-func toFontRune(fs embed.FS, fontName string, name string) FontRune {
-	txt, err := fs.ReadFile(fontName + "/" + name)
-	if err != nil {
-		panic(err)
-	}
-	var lines = container.GSlice[string](strings.Split(string(txt), "\n")).Filter(hasData)
-	return [][]bool(gslices.Map(gslices.Map(lines, toRuneSlice), toPixelSlice))
+func toFontRune(fs embed.FS, fontName string, name string) *genfuncs.Result[FontRune] {
+	return results.Map(
+		results.Map(
+			genfuncs.NewResultError(fs.ReadFile(fontName+"/"+name)),
+			func(b []byte) *genfuncs.Result[container.GSlice[string]] {
+				var lll container.GSlice[string] = strings.Split(string(b), "\n")
+				fl := lll.Filter(hasData)
+				return genfuncs.NewResult(fl)
+			}),
+		func(lines container.GSlice[string]) *genfuncs.Result[FontRune] {
+			return genfuncs.NewResult[FontRune]([][]bool(gslices.Map(gslices.Map(lines, toRuneSlice), toPixelSlice)))
+		},
+	)
 }
 
 func toCharName(path string) rune {
@@ -88,7 +94,7 @@ func toCharName(path string) rune {
 	return r
 }
 
-func fontNames(efs embed.FS) []string {
+func fontNames(efs embed.FS) container.GSlice[string] {
 	var entries container.GSlice[fs.DirEntry]
 	entries, _ = efs.ReadDir("bitmaps")
 	return gslices.Map(entries.Filter(entryIsDir), entryName)
