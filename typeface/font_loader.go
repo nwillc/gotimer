@@ -20,6 +20,7 @@ import (
 	"embed"
 	"fmt"
 	"github.com/nwillc/genfuncs/container/gslices"
+	"github.com/nwillc/genfuncs/container/maps"
 	"github.com/nwillc/genfuncs/container/sequences"
 	"github.com/nwillc/genfuncs/results"
 	"io/fs"
@@ -48,7 +49,7 @@ var (
 	toRuneSlice  genfuncs.Function[string, []rune]      = func(s string) []rune { return []rune(s) }
 	toPixel      genfuncs.Function[rune, bool]          = func(r rune) bool { return r == blackPixel }
 	toPixelSlice genfuncs.Function[[]rune, []bool]      = func(rs []rune) []bool { return gslices.Map(rs, toPixel) }
-	toFont       genfuncs.MapValueFor[string, Font]     = func(n string) *genfuncs.Result[Font] { return readBitmaps(bitmaps, "bitmaps/"+n) }
+	toFont       maps.ValueFor[string, Font]            = func(n string) *genfuncs.Result[Font] { return readBitmaps(bitmaps, "bitmaps/"+n) }
 )
 
 func init() {
@@ -59,10 +60,10 @@ func init() {
 func readBitmaps(embedFs embed.FS, path string) *genfuncs.Result[Font] {
 	result := genfuncs.NewResultError(embedFs.ReadDir(path))
 	var files container.GSlice[fs.DirEntry] = result.MustGet()
-	fMap := sequences.Associate[fs.DirEntry, rune, FontRune](files, func(f fs.DirEntry) (rune, FontRune) {
-		return toCharName(f.Name()), toFontRune(embedFs, path, f.Name()).MustGet()
+	fMap := sequences.Associate[fs.DirEntry, rune, FontRune](files, func(f fs.DirEntry) *genfuncs.Result[*maps.Entry[rune, FontRune]] {
+		return genfuncs.NewResult[*maps.Entry[rune, FontRune]](&maps.Entry[rune, FontRune]{toCharName(f.Name()), toFontRune(embedFs, path, f.Name()).MustGet()})
 	})
-	return genfuncs.NewResult(Font(fMap))
+	return genfuncs.NewResult(Font(fMap.MustGet()))
 }
 
 func toFontRune(fs embed.FS, fontName string, name string) *genfuncs.Result[FontRune] {
