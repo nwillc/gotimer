@@ -26,11 +26,12 @@ Usage:
   gotimer [flags]
 
 Flags:
-  -c, --color string   Color of timer. (default "orangered")
-  -f, --font string    Font size to use. (default "7")
+  -c, --color string   Color of timer (default "orangered")
+  -x, --exit           Exit on completion
   -h, --help           help for gotimer
-  -t, --time string    Time to count down. (default "25m")
-  -v, --version        Display version.
+  -s, --size string    Font size to use (default "7")
+  -t, --time string    Time to count down (default "25m")
+  -v, --version        Display version
 ```
 
  - The time duration is given in hours, minutes and seconds: `#h#m#s`. 
