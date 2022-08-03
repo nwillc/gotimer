@@ -61,7 +61,7 @@ func readBitmaps(embedFs embed.FS, path string) *genfuncs.Result[Font] {
 	result := genfuncs.NewResultError(embedFs.ReadDir(path))
 	var files container.GSlice[fs.DirEntry] = result.MustGet()
 	fMap := sequences.Associate[fs.DirEntry, rune, FontRune](files, func(f fs.DirEntry) *genfuncs.Result[*maps.Entry[rune, FontRune]] {
-		return genfuncs.NewResult[*maps.Entry[rune, FontRune]](&maps.Entry[rune, FontRune]{toCharName(f.Name()), toFontRune(embedFs, path, f.Name()).MustGet()})
+		return genfuncs.NewResult[*maps.Entry[rune, FontRune]](&maps.Entry[rune, FontRune]{Key: toCharName(f.Name()), Value: toFontRune(embedFs, path, f.Name()).MustGet()})
 	})
 	return genfuncs.NewResult(Font(fMap.MustGet()))
 }
